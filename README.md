@@ -1,5 +1,6 @@
 python-package-boilerplate
 ==========================
+**Current version: 0.1.0**
 
 Boilerplate for a Python Package
 
@@ -9,9 +10,9 @@ Basic structure of package is
 
 ```
 ├── README.md
-├── packagename
+├── package
 │   ├── __init__.py
-│   ├── packagename.py
+│   ├── package.py
 │   └── version.py
 ├── pytest.ini
 ├── requirements.txt
@@ -41,7 +42,7 @@ pip install -r requirements.txt
 To set up your package, ensure you have the necessary files and directories as shown in the package structure above. Specifically, you'll need:
 
 - `README.md`: This file.
-- `packagename/`: Directory containing your package's main code.
+- `package/`: Directory containing your package's main code.
 - `tests/`: Directory containing your tests.
 
 ### Setup Commands
@@ -82,57 +83,58 @@ Coverage is run by default and is set in the `pytest.ini` file. To see an HTML o
 
 ## Continuous Integration
 
-### Travis CI
-
-There is a `.travis.yml` file that is set up to run your tests for multiple Python versions. To enable Travis CI for your repository, follow these steps:
-
-1. Sign in to [Travis CI](https://travis-ci.org) with your GitHub account.
-2. Enable Travis CI for your repository.
-3. Push your code to GitHub to trigger a build.
-
 ### GitHub Actions (Optional)
 
 If you prefer GitHub Actions for CI, you can set it up with a `.github/workflows/ci.yml` file. Here’s a basic example:
 
 ```yaml
-name: CI
+name: Deploy Python Package
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    branches: [ "master" ]
 
 jobs:
-  test:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8, 3.9]
 
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-cov
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+        pip install bump2version twine wheel
 
-      - name: Run tests
-        run: |
-          pytest --cov=packagename
+    - name: Bump version
+      id: bumpversion
+      run: |
+        source venv/bin/activate
+        git config --global user.email "dev@runners.im"
+        git config --global user.name "Runners"
+        bump2version patch --allow-dirty
+        git push --follow-tags
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+    - name: Build package
+      run: |
+        source venv/bin/activate
+        python setup.py sdist bdist_wheel
+
+    - name: Deploy package
+      run: |
+        source venv/bin/activate
+        twine upload --verbose dist/*
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
 ```
 
 This will set up CI for multiple Python versions and upload the coverage report to Codecov.

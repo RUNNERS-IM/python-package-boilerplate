@@ -1,0 +1,47 @@
+name: Deploy Python Package
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+        pip install bump2version twine wheel
+
+    - name: Bump version
+      id: bumpversion
+      run: |
+        source venv/bin/activate
+        git config --global user.email "dev@runners.im"
+        git config --global user.name "Runners"
+        bump2version patch --allow-dirty
+        git push --follow-tags
+
+    - name: Build package
+      run: |
+        source venv/bin/activate
+        python setup.py sdist bdist_wheel
+
+    - name: Deploy package
+      run: |
+        source venv/bin/activate
+        twine upload --verbose dist/*
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
