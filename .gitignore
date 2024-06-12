@@ -25,8 +25,6 @@ wheels/
 *.egg
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -51,6 +49,7 @@ coverage.xml
 
 # Django stuff:
 staticfiles/
+local_settings.py
 
 # Sphinx documentation
 docs/_build/
@@ -89,30 +88,8 @@ venv.bak/
 # PyCharm settings
 .idea/
 
-# Pycharm specific files
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/dictionaries
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.xml
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-.idea/**/gradle.xml
-.idea/**/libraries
-.idea/**/mongoSettings.xml
-.idea/**/replstate.xml
-.idea/shelf/
-.idea/**/projector_server.xml
-.idea_modules/
-*.iws
-.idea_modules/
-
 # Python-specific files
 *.py[cod]
-.python-version
 
 # Installer logs
 pip-log.txt
@@ -128,3 +105,24 @@ htmlcov
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Environment variables
+.env
+.env.*
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# Editor-specific
+*~
